@@ -1,13 +1,14 @@
 from textnode import TextType,TextNode
-from htmlnode import HTMLnode,HTMLTAG
+from htmlnode import HTMLNode,LeafNode,ParentNode
+from nodeconversion import text_node_to_html_node
 
 
 def main():
-    new_textnode = TextNode("This is some anchor text", TextType.ITALIC, "https://www.boot.dev")
+    new_textnode = TextNode("This is some anchor text", TextType.TEXT)
     print("help")
     print(new_textnode.__repr__())
-    new_htmlnode = HTMLnode(tag = HTMLTAG.BOLD, value = "heelp!")
-    print(new_htmlnode.__repr__())
+    converted = text_node_to_html_node(new_textnode)
+    print(converted.to_html())
     
     
 if __name__ == "__main__":
