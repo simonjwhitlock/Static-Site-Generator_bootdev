@@ -1,7 +1,7 @@
 import unittest
 from textnode import TextType,TextNode
 from htmlnode import HTMLNode,LeafNode,ParentNode
-from nodeconversion import text_node_to_html_node
+from nodeconversion import text_node_to_html_node,split_nodes_delimiter
 
 class TestNodeConversion(unittest.TestCase):
     def test_text(self):
@@ -40,6 +40,52 @@ class TestNodeConversion(unittest.TestCase):
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "img")
         self.assertEqual(html_node.props, {"src": "https://www.google.com", "alt": "This is the alt text"})
+        
+    def test_split_textnode_onecode(self):
+        textnode_one = TextNode("This is some anchor text with a `code block` in it", TextType.TEXT)
+        split_nodes = split_nodes_delimiter([textnode_one], "`", TextType.CODE)
+        self.assertEqual(split_nodes[0].text,"This is some anchor text with a ")
+        self.assertEqual(split_nodes[0].text_type, TextType.TEXT)
+        self.assertEqual(split_nodes[1].text,"code block")
+        self.assertEqual(split_nodes[1].text_type, TextType.CODE)
+        self.assertEqual(split_nodes[2].text," in it")
+        self.assertEqual(split_nodes[2].text_type, TextType.TEXT)
+        
+    def test_split_textnode_onebold(self):
+        textnode_one = TextNode("This is some anchor text with a **bold block** in it", TextType.TEXT)
+        split_nodes = split_nodes_delimiter([textnode_one], "**", TextType.BOLD)
+        self.assertEqual(split_nodes[0].text,"This is some anchor text with a ")
+        self.assertEqual(split_nodes[0].text_type, TextType.TEXT)
+        self.assertEqual(split_nodes[1].text,"bold block")
+        self.assertEqual(split_nodes[1].text_type, TextType.BOLD)
+        self.assertEqual(split_nodes[2].text," in it")
+        self.assertEqual(split_nodes[2].text_type, TextType.TEXT)
+        
+    def test_split_two_textnodes_one_bold(self):
+        textnode_one = TextNode("This is some anchor text with a `code block` in it, and `another code block`", TextType.TEXT)
+        textnode_two = TextNode("this is a bold node with a random `code block` in the middle", TextType.BOLD)
+        split_nodes = split_nodes_delimiter([textnode_one,textnode_two], "`", TextType.CODE)
+        self.assertEqual(split_nodes[0].text,"This is some anchor text with a ")
+        self.assertEqual(split_nodes[0].text_type, TextType.TEXT)
+        self.assertEqual(split_nodes[1].text,"code block")
+        self.assertEqual(split_nodes[1].text_type, TextType.CODE)
+        self.assertEqual(split_nodes[2].text," in it, and ")
+        self.assertEqual(split_nodes[2].text_type, TextType.TEXT)
+        self.assertEqual(split_nodes[3].text,"another code block")
+        self.assertEqual(split_nodes[3].text_type, TextType.CODE)
+        self.assertEqual(split_nodes[4].text,"")
+        self.assertEqual(split_nodes[4].text_type, TextType.TEXT)
+        self.assertEqual(split_nodes[5].text,"this is a bold node with a random `code block` in the middle")
+        self.assertEqual(split_nodes[5].text_type, TextType.BOLD)
+
+    def test_split_two_textnodes_one_bold(self):
+        textnode_one = TextNode("this is a **bold** node", TextType.BOLD)
+        textnode_two = TextNode("this is an **italic** node", TextType.ITALIC)
+        textnode_three = TextNode("this is a **code** node", TextType.CODE)
+        textnode_four = TextNode("this is a **link** node", TextType.LINK, "https://google.com")
+        textnode_five = TextNode("this is a **image** node", TextType.IMAGE, "https://google.com")
+        split_nodes = split_nodes_delimiter([textnode_one, textnode_two, textnode_three, textnode_four, textnode_five],"**", TextType.TEXT)
+        self.assertEqual (split_nodes, [textnode_one, textnode_two, textnode_three, textnode_four, textnode_five])
     
 if __name__ == "__main__":
     unittest.main()
