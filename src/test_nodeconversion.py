@@ -1,7 +1,7 @@
 import unittest
 from textnode import TextType,TextNode
 from htmlnode import HTMLNode,LeafNode,ParentNode
-from nodeconversion import text_node_to_html_node,split_nodes_delimiter
+from nodeconversion import text_node_to_html_node,split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 class TestNodeConversion(unittest.TestCase):
     def test_text(self):
@@ -86,6 +86,136 @@ class TestNodeConversion(unittest.TestCase):
         textnode_five = TextNode("this is a **image** node", TextType.IMAGE, "https://google.com")
         split_nodes = split_nodes_delimiter([textnode_one, textnode_two, textnode_three, textnode_four, textnode_five],"**", TextType.TEXT)
         self.assertEqual (split_nodes, [textnode_one, textnode_two, textnode_three, textnode_four, textnode_five])
+
+    def test_split_images(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+        
+    def test_split_images2(self):
+        node = TextNode(
+            "This is text with no images",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with no images", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+    def test_split_images3(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        node2 = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node, node2])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+        
+    def test_split_images4(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        node2 = TextNode(
+            "This is text with no images",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node,node2])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+                TextNode("This is text with no images", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_split_images5(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        node2 = TextNode(
+            "This is text with no images",
+            TextType.TEXT,
+        )
+        node3 = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node,node2,node3])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+                TextNode("This is text with no images", TextType.TEXT),
+                TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+        
+    def test_split_links(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            [
+                TextNode("This is text with a link ", TextType.TEXT),
+                TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode(
+                    "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+                ),
+            ],
+            new_nodes,
+        )
+
+
+
     
 if __name__ == "__main__":
     unittest.main()
