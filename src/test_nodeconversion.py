@@ -1,7 +1,7 @@
 import unittest
 from textnode import TextType,TextNode
 from htmlnode import HTMLNode,LeafNode,ParentNode
-from nodeconversion import text_node_to_html_node,split_nodes_delimiter, split_nodes_image, split_nodes_link
+from nodeconversion import text_node_to_html_node,split_nodes_delimiter, split_nodes_image, split_nodes_link,text_to_textnodes
 
 class TestNodeConversion(unittest.TestCase):
     def test_text(self):
@@ -213,6 +213,40 @@ class TestNodeConversion(unittest.TestCase):
             ],
             new_nodes,
         )
+        
+    def test_text_to_textnodes1(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        nodes = text_to_textnodes(text)
+        self.assertEqual(10 , len(nodes))
+        self.assertEqual("This is ", nodes[0].text)
+        self.assertEqual(TextType.TEXT, nodes[0].text_type)
+        self.assertEqual("text", nodes[1].text)
+        self.assertEqual(TextType.BOLD, nodes[1].text_type)
+        self.assertEqual("italic", nodes[3].text)
+        self.assertEqual(TextType.ITALIC, nodes[3].text_type)
+        self.assertEqual("code block", nodes[5].text)
+        self.assertEqual(TextType.CODE, nodes[5].text_type)
+        self.assertEqual("obi wan image", nodes[7].text)
+        self.assertEqual(TextType.IMAGE, nodes[7].text_type)
+        self.assertEqual("link", nodes[9].text)
+        self.assertEqual(TextType.LINK, nodes[9].text_type)
+        
+    def test_text_to_textnodes2(self):
+        text = "This is **text**"
+        nodes = text_to_textnodes(text)
+        self.assertEqual(2 , len(nodes))
+        self.assertEqual("This is ", nodes[0].text)
+        self.assertEqual(TextType.TEXT, nodes[0].text_type)
+        self.assertEqual("text", nodes[1].text)
+        self.assertEqual(TextType.BOLD, nodes[1].text_type)
+        
+    def test_text_to_textnodes3(self):
+        text = "![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg)"
+        nodes = text_to_textnodes(text)
+        self.assertEqual(1 , len(nodes))
+        self.assertEqual("obi wan image", nodes[0].text)
+        self.assertEqual(TextType.IMAGE, nodes[0].text_type)
+        self.assertEqual("https://i.imgur.com/fJRm4Vk.jpeg", nodes[0].url)
 
 
 
