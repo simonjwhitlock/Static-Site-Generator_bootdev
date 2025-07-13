@@ -48,30 +48,3 @@ def block_to_block_type(block):
             line_no += 1
         return linetype
     return BlockType.PARA
-
-
-def demo_block_to_block_type(block):
-    lines = block.split("\n")
-
-    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
-        return BlockType.HEAD
-    if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
-        return BlockType.CODE
-    if block.startswith(">"):
-        for line in lines:
-            if not line.startswith(">"):
-                return BlockType.PARA
-        return BlockType.QUOTE
-    if block.startswith("- "):
-        for line in lines:
-            if not line.startswith("- "):
-                return BlockType.PARA
-        return BlockType.LISTU
-    if block.startswith("1. "):
-        i = 1
-        for line in lines:
-            if not line.startswith(f"{i}. "):
-                return BlockType.PARA
-            i += 1
-        return BlockType.LISTO
-    return BlockType.PARA

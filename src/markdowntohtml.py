@@ -25,8 +25,8 @@ def markdown_to_html_node(markdown):
                 children = [text_node_to_html_node(block_text_node)]
                 parent_child_nodes.append(ParentNode(tag = "pre", children= children))
             case BlockType.QUOTE:
-                block_tag = "i"
-                block_text = block.replace(">","")
+                block_tag = "blockquote"
+                block_text = block.replace("> ","")
                 children= text_to_children(block_text)
                 parent_child_nodes.append(ParentNode(tag=block_tag,children=children))
             case BlockType.LISTU:
