@@ -5,27 +5,33 @@ from regex import extract_markdown_images,extract_markdown_links
 from markdownblock import markdown_to_blocks,block_to_block_type
 from markdowntohtml import markdown_to_html_node
 
+
 def main():
-    block = """```
-This is a code block
-```"""
-    block_type = block_to_block_type(block)
-    print(block_type)
+    markdown = """###### Big **BOLD** heading with _EMPASIS_    
 
+# here lies the ashes of sanity
 
-def main_ign():
-    markdown = """# This is a heading
+_abstarcte of a stupid aritcal_
 
-This is a paragraph of text. It has some **bold** and _italic_ words inside of it.
+>this is a multi line
+>quote block
+>by a pretentious arse
 
 ```
-This is text that _should_ remain
-the **same** even with inline stuff
+for some _reason_ they
+**wrote some damn code!**
 ```
 
-- This is the first list item in a list block
-- This is a list item
-- This is another list item"""
+
+
+- to make stuff sureal they wrote
+- a dumb list too
+
+1. and an ordered one
+2. because why the hell not
+
+
+"""
     nodes = markdown_to_html_node(markdown)
     print(nodes)
     print("!!!!!!!!!!!!converting to html!!!!!!!!!!!!!!!!!")
