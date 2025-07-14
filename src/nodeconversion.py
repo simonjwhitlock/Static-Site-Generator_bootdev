@@ -26,12 +26,10 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     for node in old_nodes:
         if node.text_type is TextType.TEXT:
             split_text = node.text.split(delimiter)
-            print(text_type)
             node_text_type = True
             if len(split_text) % 2 == 0:
                 raise ValueError("invalid markdown, section not closed")
             for text_section in split_text:
-                print(text_section)
                 if text_section == "":
                     node_text_type = not node_text_type
                     continue
